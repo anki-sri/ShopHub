@@ -1,15 +1,41 @@
 import { useDispatch, useSelector } from "react-redux";
-import { removeFromCart } from "../../redux/slices/cartSlice";
+import { addToCart, removeFromCart } from "../../redux/slices/cartSlice";
 import "./Cart.css";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const Cart = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { items } = useSelector((state) => state.cart);
 
+    const [showToast, setShowToast] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() =>{
+            setShowToast(false);
+        }, 2000)
+
+        return () => clearTimeout();
+    }, [showToast])
+
+    useEffect(() => {
+        if(items.length > 0){
+            localStorage.setItem('cartItems', JSON.stringify(items))
+        }else{
+            const storedItems = localStorage.getItem('cartItems');
+            if(storedItems) {
+                const parsedItems = JSON.parse(storedItems);
+                parsedItems.forEach((parsedItem) => {
+                    dispatch(addToCart({ product: parsedItem, quantity: parsedItem.quantity }));
+                });
+            }
+        }
+    }, [items, dispatch])
+
     const handleRemove = (itemId) => {
         dispatch(removeFromCart(itemId));
+        localStorage.removeItem('cartItems');
     };
 
     const calculateTotal = () => {
@@ -33,8 +59,13 @@ const Cart = () => {
 
     return (
         <div className="cart-container">
+                
             <h1>Shopping Cart</h1>
-            
+            {showToast && (
+                    <div className="toast">
+                        <p>Item added to cart!</p>
+                    </div>
+                )}
             <div className="cart-wrapper">
                 <div className="cart-items-section">
                     <table className="cart-table">

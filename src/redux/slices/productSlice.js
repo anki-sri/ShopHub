@@ -19,6 +19,20 @@ export const fetchProducts = createAsyncThunk(
     }
 );
 
+export const fetchProductById = createAsyncThunk(
+    'products/fetchProductById',
+    async (productId, thunkAPI) => {
+        try {
+            const response = await fetch(`https://fakestoreapi.com/products/${productId}`);
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+);
+
+
 const productSlice = createSlice({
     name: "products",
     initialState,
@@ -35,7 +49,23 @@ const productSlice = createSlice({
         .addCase(fetchProducts.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;   
-        })    
+        })   
+        // Fetch product by ID cases can be added here if needed
+        .addCase(fetchProductById.pending,(state, action) => {
+            state.loading = true;
+            state.error = null;
+        }).addCase(fetchProductById.fulfilled, (state, action) => {
+            const index = state.items.findIndex(item => item.id === action.payload.id);
+            if (index !== -1) {
+                state.items[index] = action.payload;
+            } else {
+                state.items.push(action.payload);
+            }
+            state.loading = false;
+        }).addCase(fetchProductById.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
+        })
     }
 })
 

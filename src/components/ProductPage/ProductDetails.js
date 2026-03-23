@@ -1,22 +1,36 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import './ProductDetails.css';
-import { addToCart, handleQuantityChange } from '../../redux/slices/cartSlice';
-import { useState } from 'react';
+import { addToCart } from '../../redux/slices/cartSlice';
+import { useEffect, useState } from 'react';
+import { fetchProductById } from '../../redux/slices/productSlice';
 
-const ProductDetails = ({ productId }) => {
+
+const ProductDetails = () => {
 
     const { id } = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    const [currentProduct, setCurrentProduct] = useState(null);
+
     const { items } = useSelector((state) => state.products);
+
+    useEffect(() => {
+       if(!items.length) {
+         dispatch(fetchProductById(id)).then((res) => {
+            if(res.payload) {
+                setCurrentProduct(res.payload);
+            }
+        });
+       }
+    }, [dispatch, id, items.length]);
+
     // const { items: cartItems } = useSelector((state) => state.cart);
 
     const [quantity, setQuantity] = useState(1);
     
-
-    const product = items.find((item) => item.id === parseInt(id));
+    const product = currentProduct || items.find((item) => item.id === parseInt(id));
 
     const handleAddToCart = (product) => {
         dispatch(addToCart({product, quantity}));
