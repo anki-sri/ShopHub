@@ -14,7 +14,7 @@ const ProductDetails = () => {
 
     const [currentProduct, setCurrentProduct] = useState(null);
 
-    const { items } = useSelector((state) => state.products);
+    const { items, loading } = useSelector((state) => state.products);
 
     useEffect(() => {
        if(!items.length) {
@@ -78,7 +78,9 @@ const ProductDetails = () => {
                             <button className='quantity-btn' onClick={() => setQuantity(quantity + 1)}>+</button>
            
                         </div>
-                        <button className="add-to-cart-btn" onClick={() => handleAddToCart(product)}> 
+                        <button className="add-to-cart-btn" 
+                        disabled={loading}
+                        onClick={() => handleAddToCart(product)}> 
                             Add to Cart
                         </button>
                     </div>

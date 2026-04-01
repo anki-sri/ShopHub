@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, removeFromCart } from "../../redux/slices/cartSlice";
+import { removeFromCart } from "../../redux/slices/cartSlice";
 import "./Cart.css";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -17,25 +17,14 @@ const Cart = () => {
         }, 2000)
 
         return () => clearTimeout();
-    }, [showToast])
+    }, [])
 
     useEffect(() => {
-        if(items.length > 0){
-            localStorage.setItem('cartItems', JSON.stringify(items))
-        }else{
-            const storedItems = localStorage.getItem('cartItems');
-            if(storedItems) {
-                const parsedItems = JSON.parse(storedItems);
-                parsedItems.forEach((parsedItem) => {
-                    dispatch(addToCart({ product: parsedItem, quantity: parsedItem.quantity }));
-                });
-            }
-        }
-    }, [items, dispatch])
+        localStorage.setItem('cartItems', JSON.stringify(items))
+    }, [items])
 
     const handleRemove = (itemId) => {
         dispatch(removeFromCart(itemId));
-        localStorage.removeItem('cartItems');
     };
 
     const calculateTotal = () => {
